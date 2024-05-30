@@ -2,15 +2,23 @@ import {View, Text, StyleSheet, ScrollView} from 'react-native';
 import React, {useState} from 'react';
 import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
-import SocialSignInButtons from '../../components/SocialSignInButtons';
 import {useNavigation} from '@react-navigation/native';
+import {useForm} from 'react-hook-form';
 
 const ForgetPasswordScreen = () => {
-  const [username, setUsername] = useState('');
+  // const [username, setUsername] = useState('');
   const navigation = useNavigation();
 
+  // Form Controller
+  const {
+    control,
+    handleSubmit,
+    formState: {errors},
+  } = useForm();
+
   //Sign In Funtion
-  const onSendPressed = () => {
+  const onSendPressed = data => {
+    console.warn(data);
     navigation.navigate('NewPassword');
   };
 
@@ -27,13 +35,14 @@ const ForgetPasswordScreen = () => {
 
         {/* Username */}
         <CustomInput
+          name="username"
           placeholder="Enter your confirmation code"
-          value={username}
-          setValue={setUsername}
+          control={control}
+          rules={{required: 'Username is required'}}
         />
 
         {/* Button Send */}
-        <CustomButton text="Send" onPress={onSendPressed} />
+        <CustomButton text="Send" onPress={handleSubmit(onSendPressed)} />
 
         {/* Back To Sign In */}
         <CustomButton

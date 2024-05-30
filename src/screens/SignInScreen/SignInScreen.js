@@ -69,7 +69,13 @@ const SignInScreen = () => {
           control={control}
           placeholder="Password"
           secureTextEntry={true}
-          rules={{required: 'Password is required'}}
+          rules={{
+            required: 'Password is required',
+            minLength: {
+              value: 3,
+              message: 'Password should be minimum 3 charaters long',
+            },
+          }}
         />
 
         {/* Button Login */}

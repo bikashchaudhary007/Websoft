@@ -3,15 +3,24 @@ import React, {useState} from 'react';
 import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
 import {useNavigation} from '@react-navigation/native';
+import {useForm} from 'react-hook-form';
 
 const NewPasswordScreen = () => {
-  const [code, setCode] = useState('');
-  const [newPassword, setNewPassword] = useState('');
+  // const [code, setCode] = useState('');
+  // const [newPassword, setNewPassword] = useState('');
+
+  // Form Controller
+  const {
+    control,
+    handleSubmit,
+    formState: {errors},
+  } = useForm();
 
   const navigation = useNavigation();
 
   //Sign In Funtion
-  const onSubmitPressed = () => {
+  const onSubmitPressed = data => {
+    console.warn(data);
     navigation.navigate('Home');
   };
 
@@ -28,20 +37,29 @@ const NewPasswordScreen = () => {
 
         {/* Code */}
         <CustomInput
+          name="code"
           placeholder="Enter your confirmation code"
-          value={code}
-          setValue={setCode}
+          control={control}
+          rules={{required: 'Code is required'}}
         />
 
         {/* New Password */}
         <CustomInput
+          name="newpassword"
           placeholder="Enter your new password"
-          value={newPassword}
-          setValue={setNewPassword}
+          control={control}
+          secureTextEntry={true}
+          rules={{
+            required: 'New password required',
+            minLength: {
+              value: 6,
+              message: 'Password should be at least 6 character long',
+            },
+          }}
         />
 
         {/* Button Send */}
-        <CustomButton text="Submit" onPress={onSubmitPressed} />
+        <CustomButton text="Submit" onPress={handleSubmit(onSubmitPressed)} />
 
         {/* Back To Sign In */}
         <CustomButton
