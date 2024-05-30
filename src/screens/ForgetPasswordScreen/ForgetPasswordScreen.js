@@ -3,23 +3,20 @@ import React, {useState} from 'react';
 import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
 import SocialSignInButtons from '../../components/SocialSignInButtons';
+import {useNavigation} from '@react-navigation/native';
 
 const ForgetPasswordScreen = () => {
   const [username, setUsername] = useState('');
+  const navigation = useNavigation();
 
   //Sign In Funtion
   const onSendPressed = () => {
-    console.warn('Send Pressed');
+    navigation.navigate('NewPassword');
   };
 
   // On SignUp for Don't have an account
   const onSignInPressed = () => {
-    console.warn('On SignIn Pressed');
-  };
-
-  //Resend Funtion
-  const onResendPressed = () => {
-    console.warn('Resend Pressed');
+    navigation.navigate('SignIn');
   };
 
   return (
@@ -35,7 +32,7 @@ const ForgetPasswordScreen = () => {
           setValue={setUsername}
         />
 
-        {/* Button Login */}
+        {/* Button Send */}
         <CustomButton text="Send" onPress={onSendPressed} />
 
         {/* Back To Sign In */}

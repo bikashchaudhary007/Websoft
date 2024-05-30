@@ -2,15 +2,16 @@ import {View, Text, StyleSheet, ScrollView} from 'react-native';
 import React, {useState} from 'react';
 import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
-import SocialSignInButtons from '../../components/SocialSignInButtons';
 import {useNavigation} from '@react-navigation/native';
 
-const ConfirmEmailScreen = () => {
+const NewPasswordScreen = () => {
   const [code, setCode] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+
   const navigation = useNavigation();
 
   //Sign In Funtion
-  const onConfirmPressed = () => {
+  const onSubmitPressed = () => {
     navigation.navigate('Home');
   };
 
@@ -19,16 +20,11 @@ const ConfirmEmailScreen = () => {
     navigation.navigate('SignIn');
   };
 
-  //Resend Funtion
-  const onResendPressed = () => {
-    console.warn('Resend Pressed');
-  };
-
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <View style={styles.root}>
         {/* Title */}
-        <Text style={styles.title}>Confirm Your Email</Text>
+        <Text style={styles.title}>Reset Your Password</Text>
 
         {/* Code */}
         <CustomInput
@@ -37,15 +33,15 @@ const ConfirmEmailScreen = () => {
           setValue={setCode}
         />
 
-        {/* Button Login */}
-        <CustomButton text="Confirm" onPress={onConfirmPressed} />
-
-        {/* Reset*/}
-        <CustomButton
-          text="Resend Code"
-          onPress={onResendPressed}
-          type="SECONDARY"
+        {/* New Password */}
+        <CustomInput
+          placeholder="Enter your new password"
+          value={newPassword}
+          setValue={setNewPassword}
         />
+
+        {/* Button Send */}
+        <CustomButton text="Submit" onPress={onSubmitPressed} />
 
         {/* Back To Sign In */}
         <CustomButton
@@ -84,4 +80,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ConfirmEmailScreen;
+export default NewPasswordScreen;

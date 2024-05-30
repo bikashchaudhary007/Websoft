@@ -11,6 +11,7 @@ import Logo from '../../../assets/images/wsnitlogo.png';
 import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
 import SocialSignInButtons from '../../components/SocialSignInButtons';
+import {useNavigation} from '@react-navigation/native';
 
 const SignInScreen = () => {
   const [username, setUsername] = useState('');
@@ -18,20 +19,23 @@ const SignInScreen = () => {
 
   //Sign In Funtion
   const onSignInPressed = () => {
-    console.warn('Sign In');
+    //validate user
+
+    navigation.navigate('Home');
   };
 
   //Forget Password Funtion
   const onForgotPasswordPressed = () => {
-    console.warn('Forgot Password');
+    navigation.navigate('ForgotPassword');
   };
 
   // On SignUp for Don't have an account
   const onSignUpPressed = () => {
-    console.warn('On SignUp Pressed');
+    navigation.navigate('SignUp');
   };
   // creating the height
   const {height} = useWindowDimensions();
+  const navigation = useNavigation();
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <View style={styles.root}>
