@@ -5,6 +5,8 @@ import CustomButton from '../../components/CustomButton';
 import SocialSignInButtons from '../../components/SocialSignInButtons';
 import {useNavigation} from '@react-navigation/native';
 import {useForm, Controller} from 'react-hook-form';
+import {createUserWithEmailAndPassword} from 'firebase/auth';
+import {auth} from '../../../firebaseconfig/firebase';
 
 // Rex Exp For Email Validation
 const EMAIL_REGEX =
@@ -29,9 +31,17 @@ const SignUpScreen = () => {
   const navigation = useNavigation();
 
   //Sign In Funtion
-  const onRegisterPressed = data => {
-    // console.warn(data);
-    navigation.navigate('ConfirmEmail');
+  const onRegisterPressed = async data => {
+    // console.warn(data.password);
+    if (data.email && data.password) {
+      try {
+        await createUserWithEmailAndPassword(auth, data.email, data.password);
+        // navigation.navigate('ConfirmEmail');
+        navigation.navigate('Home');
+      } catch (e) {
+        console.log('SignUp Error:', e.message);
+      }
+    }
   };
 
   // On SignUp for Don't have an account
@@ -74,7 +84,7 @@ const SignUpScreen = () => {
 
         {/* Email */}
         <CustomInput
-          name="Email"
+          name="email"
           placeholder="Email"
           control={control}
           rules={{pattern: {value: EMAIL_REGEX, message: 'Email is invalid'}}}
