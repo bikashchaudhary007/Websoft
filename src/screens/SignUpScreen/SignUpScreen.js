@@ -40,6 +40,7 @@ const SignUpScreen = () => {
         navigation.navigate('Home');
       } catch (e) {
         console.log('SignUp Error:', e.message);
+        alert(`SignUp Error: ${e.message}`);
       }
     }
   };
