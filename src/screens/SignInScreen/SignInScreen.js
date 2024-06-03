@@ -1,11 +1,10 @@
 import {
   View,
-  Text,
   Image,
   StyleSheet,
   useWindowDimensions,
   ScrollView,
-  TextInput,
+  RefreshControl,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import Logo from '../../../assets/images/wsnitlogo.png';
@@ -20,12 +19,14 @@ import {ActivityIndicator} from 'react-native';
 
 const SignInScreen = () => {
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Form Controller
   const {
     control,
     handleSubmit,
     formState: {errors},
+    reset,
   } = useForm();
 
   //Sign In Funtion
@@ -38,6 +39,7 @@ const SignInScreen = () => {
       try {
         await signInWithEmailAndPassword(auth, data.username, data.password);
         navigation.navigate('Home');
+        reset();
       } catch (e) {
         console.error('SignIn Error:', e);
         alert(`SignIn Error: ${e.message}`);
@@ -59,11 +61,23 @@ const SignInScreen = () => {
     navigation.navigate('SignUp');
   };
 
+  const handleRefresh = () => {
+    setRefreshing(true);
+    reset();
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  };
+
   // creating the height
   const {height} = useWindowDimensions();
   const navigation = useNavigation();
   return (
-    <ScrollView showsVerticalScrollIndicator={false}>
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+      }>
       <View style={styles.root}>
         {loading ? (
           <ActivityIndicator size="large" color="#0000ff" />

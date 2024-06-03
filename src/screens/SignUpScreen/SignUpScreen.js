@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet, ScrollView} from 'react-native';
+import {View, Text, StyleSheet, ScrollView, RefreshControl} from 'react-native';
 import React, {useState} from 'react';
 import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
@@ -6,31 +6,44 @@ import SocialSignInButtons from '../../components/SocialSignInButtons';
 import {useNavigation} from '@react-navigation/native';
 import {useForm, Controller} from 'react-hook-form';
 import {createUserWithEmailAndPassword} from 'firebase/auth';
-// import {auth} from '../../../firebaseconfig/firebase';
 import {auth, db} from '../../../firebaseconfig/firebase'; // Import Firestore
 import {setDoc, doc} from 'firebase/firestore'; // Firestore functions
 import Toast from 'react-native-toast-message';
+import {ActivityIndicator} from 'react-native';
 
 // Rex Exp For Email Validation
 const EMAIL_REGEX =
   /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 
 const SignUpScreen = () => {
+  const [loading, setLoading] = useState(false);
   // Form Controller
   const {
     control,
     handleSubmit,
     formState: {errors},
     watch,
+    reset,
   } = useForm();
   // Watching the value of password for confirm password
   const pwd = watch('password');
 
   const navigation = useNavigation();
 
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    reset();
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  };
+
   // Sign Up Function
   const onRegisterPressed = async data => {
     if (data.email && data.password) {
+      setLoading(true);
       try {
         const userCredential = await createUserWithEmailAndPassword(
           auth,
@@ -48,6 +61,8 @@ const SignUpScreen = () => {
         // Navigate to Home screen
         navigation.navigate('Home');
 
+        reset();
+
         Toast.show({
           type: 'success',
           text1: 'Success',
@@ -56,6 +71,8 @@ const SignUpScreen = () => {
       } catch (e) {
         console.log('SignUp Error:', e.message);
         alert(`SignUp Error: ${e.message}`);
+      } finally {
+        setLoading(false); // Stop loading
       }
     }
   };
@@ -90,89 +107,101 @@ const SignUpScreen = () => {
   };
 
   return (
-    <ScrollView showsVerticalScrollIndicator={false}>
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+      }>
       <View style={styles.root}>
-        {/* Title */}
-        <Text style={styles.title}>Create an account</Text>
+        {loading ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+          <>
+            {/* Title */}
+            <Text style={styles.title}>Create an account</Text>
 
-        {/* Username */}
-        <CustomInput
-          name="username"
-          placeholder="Username"
-          control={control}
-          rules={{
-            required: 'Username is required',
-            minLength: {
-              value: 3,
-              message: 'Username should be at least 3 characters long',
-            },
-            maxLength: {
-              value: 24,
-              message: 'Username should be max 24 characters long',
-            },
-          }}
-        />
+            {/* Username */}
+            <CustomInput
+              name="username"
+              placeholder="Username"
+              control={control}
+              rules={{
+                required: 'Username is required',
+                minLength: {
+                  value: 3,
+                  message: 'Username should be at least 3 characters long',
+                },
+                maxLength: {
+                  value: 24,
+                  message: 'Username should be max 24 characters long',
+                },
+              }}
+            />
 
-        {/* Email */}
-        <CustomInput
-          name="email"
-          placeholder="Email"
-          control={control}
-          rules={{pattern: {value: EMAIL_REGEX, message: 'Email is invalid'}}}
-        />
+            {/* Email */}
+            <CustomInput
+              name="email"
+              placeholder="Email"
+              control={control}
+              rules={{
+                pattern: {value: EMAIL_REGEX, message: 'Email is invalid'},
+              }}
+            />
 
-        {/* Pasword */}
-        <CustomInput
-          name="password"
-          placeholder="Password"
-          control={control}
-          secureTextEntry={true}
-          rules={{
-            required: 'Password is required',
-            minLength: {
-              value: 6,
-              message: 'Username should be at least 6 characters long',
-            },
-          }}
-        />
+            {/* Pasword */}
+            <CustomInput
+              name="password"
+              placeholder="Password"
+              control={control}
+              secureTextEntry={true}
+              rules={{
+                required: 'Password is required',
+                minLength: {
+                  value: 6,
+                  message: 'Username should be at least 6 characters long',
+                },
+              }}
+            />
 
-        {/* Repeat Password */}
-        <CustomInput
-          name="repeat-password"
-          placeholder="Repeat Password"
-          control={control}
-          secureTextEntry={true}
-          rules={{
-            validate: value => value === pwd || 'Password do not matchd',
-          }}
-        />
+            {/* Repeat Password */}
+            <CustomInput
+              name="repeat-password"
+              placeholder="Repeat Password"
+              control={control}
+              secureTextEntry={true}
+              rules={{
+                validate: value => value === pwd || 'Password do not matchd',
+              }}
+            />
 
-        {/* Button Login */}
-        <CustomButton
-          text="Register"
-          onPress={handleSubmit(onRegisterPressed)}
-        />
+            {/* Button Login */}
+            <CustomButton
+              text="Register"
+              onPress={handleSubmit(onRegisterPressed)}
+            />
 
-        {/* Terms Text */}
-        <Text style={styles.text}>
-          By registering, you confirm that you accept our{' '}
-          <Text style={styles.link} onPress={onTermsOfUsePressed}>
-            Terms of Use
-          </Text>{' '}
-          and{' '}
-          <Text style={styles.link} onPress={onPrivacyPressed}>
-            Privacy Policy
-          </Text>
-        </Text>
+            {/* Terms Text */}
+            <Text style={styles.text}>
+              By registering, you confirm that you accept our{' '}
+              <Text style={styles.link} onPress={onTermsOfUsePressed}>
+                Terms of Use
+              </Text>{' '}
+              and{' '}
+              <Text style={styles.link} onPress={onPrivacyPressed}>
+                Privacy Policy
+              </Text>
+            </Text>
 
-        <SocialSignInButtons />
+            <SocialSignInButtons />
 
-        {/* Don't Have an account */}
-        <CustomButton
-          text="Have an account? Sign In"
-          onPress={onSignInPressed}
-          type="TERTIARY"
-        />
+            {/* Don't Have an account */}
+            <CustomButton
+              text="Have an account? Sign In"
+              onPress={onSignInPressed}
+              type="TERTIARY"
+            />
+          </>
+        )}
       </View>
       <Toast ref={ref => Toast.setRef(ref)} />
     </ScrollView>
