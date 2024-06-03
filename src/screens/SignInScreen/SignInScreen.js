@@ -19,7 +19,6 @@ import {auth} from '../../../firebaseconfig/firebase';
 import {ActivityIndicator} from 'react-native';
 
 const SignInScreen = () => {
-  // const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(false);
 
   // Form Controller
@@ -33,6 +32,7 @@ const SignInScreen = () => {
   const onSignInPressed = async data => {
     // console.warn(data);
     // alert(`Username: ${data.username}, Password: ${data.password}`);
+
     if (data.username && data.password) {
       setLoading(true);
       try {
@@ -58,6 +58,7 @@ const SignInScreen = () => {
   const onSignUpPressed = () => {
     navigation.navigate('SignUp');
   };
+
   // creating the height
   const {height} = useWindowDimensions();
   const navigation = useNavigation();

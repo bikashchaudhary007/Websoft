@@ -6,18 +6,16 @@ import SocialSignInButtons from '../../components/SocialSignInButtons';
 import {useNavigation} from '@react-navigation/native';
 import {useForm, Controller} from 'react-hook-form';
 import {createUserWithEmailAndPassword} from 'firebase/auth';
-import {auth} from '../../../firebaseconfig/firebase';
+// import {auth} from '../../../firebaseconfig/firebase';
+import {auth, db} from '../../../firebaseconfig/firebase'; // Import Firestore
+import {setDoc, doc} from 'firebase/firestore'; // Firestore functions
+import Toast from 'react-native-toast-message';
 
 // Rex Exp For Email Validation
 const EMAIL_REGEX =
   /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 
 const SignUpScreen = () => {
-  // const [username, setUsername] = useState('');
-  // const [email, setEmail] = useState('');
-  // const [password, setPassword] = useState('');
-  // const [passwordRepeat, setPasswordRepeat] = useState('');
-
   // Form Controller
   const {
     control,
@@ -30,7 +28,38 @@ const SignUpScreen = () => {
 
   const navigation = useNavigation();
 
-  //Sign In Funtion
+  // Sign Up Function
+  const onRegisterPressed = async data => {
+    if (data.email && data.password) {
+      try {
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          data.email,
+          data.password,
+        );
+        const user = userCredential.user;
+
+        // Save username and email to Firestore
+        await setDoc(doc(db, 'users', user.uid), {
+          username: data.username,
+          email: user.email,
+        });
+
+        // Navigate to Home screen
+        navigation.navigate('Home');
+
+        Toast.show({
+          type: 'success',
+          text1: 'Success',
+          text2: 'Sign Up Successfully',
+        });
+      } catch (e) {
+        console.log('SignUp Error:', e.message);
+        alert(`SignUp Error: ${e.message}`);
+      }
+    }
+  };
+  /*
   const onRegisterPressed = async data => {
     // console.warn(data.password);
     if (data.email && data.password) {
@@ -44,6 +73,7 @@ const SignUpScreen = () => {
       }
     }
   };
+  */
 
   // On SignUp for Don't have an account
   const onSignInPressed = () => {
@@ -144,6 +174,7 @@ const SignUpScreen = () => {
           type="TERTIARY"
         />
       </View>
+      <Toast ref={ref => Toast.setRef(ref)} />
     </ScrollView>
   );
 };
